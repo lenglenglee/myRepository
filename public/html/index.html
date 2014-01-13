@@ -1,6 +1,6 @@
 
 <!DOCTYPE html>
-<html ng-app>
+<html ng-app="myApp">
 <head>
 	<meta charset="utf-8">
 	<!--为了确保适当的绘制和触屏缩放，需要在<head>之中添加viewport元数据标签。-->
@@ -9,20 +9,51 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 	<title>601尼玛粽</title>
 	<link rel="stylesheet"  href="../css/bootstrap/bootstrap.min.css">
+	<link rel="stylesheet"  href="../css/metronic/style-metronic.css">
+
 	<script type="text/javascript" src="../js/jquery/jquery-1.10.2.min.js"></script>
+	<script  type="text/javascript" src="/socket.io/socket.io.js"></script>
 	<script type="text/javascript" src="../js/bootstrap/bootstrap.min.js"></script>
 	<script type="text/javascript" src="../js/angularjs/angular.min.js"></script>
+
+
+    
+    <script type="text/javascript">
+    	var myApp=angular.module('myApp',[]);
+    	
+    </script>
+    <script type="text/javascript" src="../javascripts/socketService.js"></script>
 	<script type="text/javascript">
+		
 		function menuController($scope,$http){
 			$http({method:'GET',url:'/menu'}).success(function(data,status,headers,config){
 				$scope.menu=data;
 			}).error(function(data,status,headers,config){
 				$scope.menu=[];
 			});
+
 			
 		}
 		function headerController($scope,$http){
 			
+			
+		}
+
+		function loginController($scope,socket){
+			// $scope.user="ll";
+			socket.on('connect', function () {
+				console.log(socket);
+				socket.send("hello socket");
+   				socket.on('message', function (msg) {
+   					console.log(msg);
+   					$scope.password=msg;
+   		 		});
+   		 		
+			});
+			$scope.changeuser=function(){
+   		 			console.log($scope.user);
+					socket.send($scope.user);
+			}
 			
 		}
 
@@ -33,10 +64,10 @@
 </head>
 
 <body>
-	<header ng-controller="headerController">
+	<header ng-controller="headerController" class="header">
 		<h1>Welcome To 601尼玛粽<small>  ——肥斌的私人测试主页</small></h1>
 	</header>
-	<nav class="navbar navbar-default" role="navigation">
+	<nav class="navbar navbar-default"  role="navigation">
 		<div class="navbar-header">
   			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navMenu">
       			<span class="sr-only">Toggle navigation</span>
@@ -48,21 +79,22 @@
   		</div>
   		<div class="collapse navbar-collapse" id="navMenu">
   			<ul class="nav navbar-nav">
-  				<li class="active"><a href="javascript:void(0);" class="">旅程</a></li>
-  				<li ><a href="javascript:void(0);" class="">大事件</a></li>
+  				<li class=""><a href="javascript:void(0);" class="">旅程</a></li>
+  				<li class="active"><a href="javascript:void(0);" class="">大事件</a></li>
   				<li ><a href="javascript:void(0);" class="">私人空间</a></li>
+  				<li ><a href="javascript:void(0);" class="">讨论组</a></li>
 
   			</ul>
-  			<form class="navbar-form navbar-right">
+  			<form class="navbar-form navbar-right" ng-controller="loginController">
   				<div class="form-group">
   					<label for="username" class="sr-only">username:</label>
-  					<input type="text" id="username" class="form-control" placeholder="username">
+  					<input type="text" id="username" class="form-control" placeholder="username" ng-change="changeuser()" ng-model="user">
   				</div>	
   				<div class="form-group">
   					<label for="password" class="sr-only">passord:</label>
-  					<input type="password" id="password" class="form-control" placeholder="password">
+  					<input type="text" id="password" class="form-control" placeholder="password" ng-model="password">
   				</div>
-  				<button class="btn btn-default">login</button>
+  				<button type="button" class="btn btn-success">login</button>
   			</form>
 
   		</div>
